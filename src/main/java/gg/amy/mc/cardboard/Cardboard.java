@@ -46,7 +46,12 @@ public class Cardboard extends JavaPlugin {
     public final void onEnable() {
         init();
     }
-    
+
+    @Override
+    public final void onDisable() {
+        dispose();
+    }
+
     private void scan(final String pkg) {
         graph = new ClassGraph().enableAllInfo().whitelistPackages(pkg).scan();
         loadComponents();
@@ -348,5 +353,22 @@ public class Cardboard extends JavaPlugin {
     
     public final ConfigurationSection loadConfig(final String path) {
         return loader.loadFile(path);
+    }
+
+    private void dispose() {
+        disposeSingletons();
+    }
+
+    private void disposeSingletons() {
+        singletons.values().forEach(v -> {
+            if(v instanceof LoadableComponent) {
+                final LoadableComponent l = (LoadableComponent) v;
+                if(l.dispose()) {
+                    getLogger().info("Disabled component " + getComponentName(v) + ": " + getComponentDescription(v));
+                } else {
+                    getLogger().warning("Failed disabling component " + getComponentName(v) + ": " + getComponentDescription(v));
+                }
+            }
+        });
     }
 }

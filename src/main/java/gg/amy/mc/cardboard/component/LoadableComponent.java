@@ -24,4 +24,8 @@ public abstract class LoadableComponent {
     public boolean init() {
         return true;
     }
+
+    public boolean dispose() {
+        return true;
+    }
 }
